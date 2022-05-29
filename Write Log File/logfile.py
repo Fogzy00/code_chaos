@@ -1,13 +1,9 @@
 import datetime
 import pytz
-import os
+import pandas as pd
 
-log_file_path = 'C:\Users\Fogzy\Documents\GitHub\code_chaos\Write Log File'
-log_file_name = '\loggy.txt'
-log_file = log_file_path + log_file_name
-event_id = 1
+log_file = r'C:\Users\Fogzy\Documents\GitHub\code_chaos\Write Log File\loggy.csv'
 
- 
 # Get current date/timestamp
 now = datetime.datetime.now(pytz.timezone('US/Central'))
 
@@ -15,55 +11,40 @@ now = datetime.datetime.now(pytz.timezone('US/Central'))
 curr_date = now.strftime('%m/%d/%Y')
 curr_time = now.strftime('%H:%M:%S')
 
-# Get user that is logged in
+# Get user that is logged in (to be written later)
 curr_user = os.getlogin()
 
-# event_id =
-with open(log_file,'r') as f:
-    f.readlines()
-    for line in lines:
-        print(line)
+# Get eventID. Read the csv log file to a dataframe, extract the eventID column and get the max. Add 1 to that to get the new eventID.
+df_logfile = pd.read_csv(log_file,index_col=False)
+df_eventid = df_logfile['event_id']
+max_eventid = df_eventid.max()
+curr_eventid = max_eventid + 1
 
-log_file_launch_writer = [event_id,
+# Put new log events into list - these variables aren't updating....
+write_log_launch = [curr_eventid,
                             curr_date,
                             curr_time,
                             curr_user,
                             'Application launched',
-                            'The application was launched by ' + curr_user + ' at ' + curr_time + ' on ' + curr_date + '\n'
+                            'The application was launched by ' + curr_user + ' at ' + curr_time + ' on ' + curr_date'
                             ]
+# print(write_log_launch)
+column_names = ['event_id','date','time','user','event','description']
 
-eventID = event_id + 1
+# Write the new log entry to new df
+df_new_log = pd.DataFrame(write_log_launch,index_col=False).T
+df_new_log.columns = column_names
 
+print(df_logfile)
+print(df_new_log)
 
-print(log_file_launch_writer)
-# log_file_launch_input = log_file_launch_input.append(curr_date, curr_time,'Application launched',"Testttttt description ohboy it's a big one")
-# print(log_file_launch_input)
+# #Concat the new and the old dfs
+concat_list = [df_logfile,df_new_log]
+df_output = pd.concat(concat_list, ignore_index=False)
 
-# write a log eventID and prevEventID
+# Re-write log file
+df_output.to_csv(log_file,index=False)
 
-
-# # Table
-# #EventId|Date|Time|User|Event|Description
-
-
-# f.write('\t'.join(l[1:]) + '\n')
-
-
-# # def log_entry_launched(logfilepath):
-# #     with open(logfilepath,'a') as f:
-#     f.write()
-
-#     return
-
-# def log_entry_closed:
-
-# def log_entry_other2:
-
-
-
-# # log program name
-# # version
-# # user name
-# # date/time
-# # time closed
+# Print final df.
+print(df_output)
 
